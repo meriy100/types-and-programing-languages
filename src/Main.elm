@@ -49,31 +49,37 @@ eval1 : Term -> Result Error Term
 eval1 t =
     case t of
         TmIF _ (TmTrue _) t2 t3 ->
-            Result.Ok t2
+            t2
+                |> Result.Ok
 
         TmIF _ (TmFalse _) t2 t3 ->
-            Result.Ok t3
+            t3
+                |> Result.Ok
 
         TmIF fi t1 t2 t3 ->
             let
                 result =
                     eval1 t1
             in
-            Result.andThen (\t1a -> Result.Ok (TmIF fi t1a t2 t3)) result
+            result
+                |> Result.map (\t1a -> TmIF fi t1a t2 t3)
 
         TmSucc fi t1 ->
             let
                 result =
                     eval1 t1
             in
-            Result.andThen (\t1a -> Result.Ok (TmSucc fi t1a)) result
+            result
+                |> Result.map (\t1a -> TmSucc fi t1a)
 
         TmPred _ (TmZero _) ->
-            TmZero Info |> Result.Ok
+            TmZero Info
+                |> Result.Ok
 
         TmPred _ (TmSucc _ nv1) ->
             if isnumericval nv1 then
-                nv1 |> Result.Ok
+                nv1
+                    |> Result.Ok
 
             else
                 NoRuleApplies |> Result.Err
@@ -83,54 +89,51 @@ eval1 t =
                 result =
                     eval1 t1
             in
-            Result.andThen (\t1a -> Result.Ok (TmPred fi t1a)) result
+            result
+                |> Result.map (\t1a -> TmPred fi t1a)
 
         TmIsZero _ (TmZero _) ->
-            TmTrue Info |> Result.Ok
+            TmTrue Info
+                |> Result.Ok
 
         TmIsZero _ (TmSucc _ nv1) ->
             if isnumericval nv1 then
-                TmFalse Info |> Result.Ok
+                TmFalse Info
+                    |> Result.Ok
 
             else
-                NoRuleApplies |> Result.Err
+                NoRuleApplies
+                    |> Result.Err
 
         TmIsZero fi t1 ->
             let
                 result =
                     eval1 t1
             in
-            Result.andThen (\t1a -> Result.Ok (TmIsZero fi t1a)) result
+            result
+                |> Result.map (\t1a -> TmIsZero fi t1a)
 
         _ ->
             Result.Err NoRuleApplies
-
-
-boolToString bool =
-    if bool then
-        "true"
-
-    else
-        "false"
 
 
 main =
     H.div []
         [ H.text "Hello!"
         , H.div []
-            [ H.text "isnumericval TmZero ="
-            , H.text (isnumericval (TmZero Info) |> boolToString)
+            [ H.text "isnumericval TmZero = "
+            , H.text (isnumericval (TmZero Info) |> Debug.toString)
             ]
         , H.div []
             [ H.text "isnumericval TmSucc TmSucc TmZero ="
-            , H.text (isnumericval (TmSucc Info (TmSucc Info (TmZero Info))) |> boolToString)
+            , H.text (isnumericval (TmSucc Info (TmSucc Info (TmZero Info))) |> Debug.toString)
             ]
         , H.div []
-            [ H.text "isval ="
-            , H.text (isval (TmIF Info (TmTrue Info) (TmZero Info) (TmSucc Info (TmZero Info))) |> boolToString)
+            [ H.text "isval = "
+            , H.text (isval (TmIF Info (TmTrue Info) (TmZero Info) (TmSucc Info (TmZero Info))) |> Debug.toString)
             ]
         , H.div []
-            [ H.text "eval1 ="
+            [ H.text "eval1 = "
             , H.text (eval1 (TmIF Info (TmIsZero Info (TmTrue Info)) (TmZero Info) (TmSucc Info (TmZero Info))) |> Debug.toString)
             ]
         ]
