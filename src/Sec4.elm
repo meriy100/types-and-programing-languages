@@ -1,4 +1,4 @@
-module Main exposing (Term(..), isnumericval, main)
+module Sec4 exposing (Term(..), isnumericval, main)
 
 import Html as H
 
@@ -117,23 +117,22 @@ eval1 t =
             Result.Err NoRuleApplies
 
 
+source =
+    TmIF Info
+        (TmIsZero Info (TmSucc Info (TmZero Info)))
+        (TmZero Info)
+        (TmFalse Info)
+
+
 main =
     H.div []
-        [ H.text "Hello!"
-        , H.div []
-            [ H.text "isnumericval TmZero = "
-            , H.text (isnumericval (TmZero Info) |> Debug.toString)
-            ]
-        , H.div []
-            [ H.text "isnumericval TmSucc TmSucc TmZero ="
-            , H.text (isnumericval (TmSucc Info (TmSucc Info (TmZero Info))) |> Debug.toString)
-            ]
-        , H.div []
-            [ H.text "isval = "
-            , H.text (isval (TmIF Info (TmTrue Info) (TmZero Info) (TmSucc Info (TmZero Info))) |> Debug.toString)
-            ]
-        , H.div []
-            [ H.text "eval1 = "
-            , H.text (eval1 (TmIF Info (TmIsZero Info (TmTrue Info)) (TmZero Info) (TmSucc Info (TmZero Info))) |> Debug.toString)
+        [ H.div []
+            [ source |> Debug.toString |> H.text |> List.singleton |> H.p []
+            , eval1 source
+                |> Result.andThen eval1
+                |> Debug.toString
+                |> H.text
+                |> List.singleton
+                |> H.p []
             ]
         ]
