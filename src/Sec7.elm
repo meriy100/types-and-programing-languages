@@ -1,5 +1,6 @@
 module Sec7 exposing (..)
 
+import Array
 import Html as H
 
 
@@ -54,23 +55,24 @@ printtm ctx t =
                 "[bad index]"
 
 
+getAt : Int -> Context -> Maybe ( String, Binding )
+getAt n ctx =
+    Array.fromList ctx
+        |> Array.get n
+
+
 index2name : Info -> Context -> Int -> String
 index2name fi ctx x =
     let
-        _ =
-            Debug.log "index2name" ( x, ctx )
-
         ( _, b ) =
-            List.drop (x - 1) ctx
-                |> List.head
+            getAt x ctx
                 |> Maybe.withDefault ( "[index2name error1]", None )
     in
     case b of
         NameBind ->
             let
                 ( n, _ ) =
-                    List.drop (x - 1) ctx
-                        |> List.head
+                    getAt x ctx
                         |> Maybe.withDefault ( "[index2name error2]", None )
             in
             n
