@@ -81,29 +81,73 @@ index2name fi ctx x =
             "[index2name error3]"
 
 
-source : Term
+source1 : Term
+source1 =
+    TmAbs Info "s" (TmAbs Info "z" (TmVar Info 0 2))
 
 
+source2 : Term
+source2 =
+    TmAbs Info
+        "s"
+        (TmAbs Info
+            "z"
+            (TmApp Info
+                (TmVar Info 1 2)
+                (TmApp Info (TmVar Info 1 2) (TmVar Info 0 2))
+            )
+        )
 
---source =
---    TmAbs Info "s" (TmAbs Info "z" (TmVar Info 0 2))
+
+source3 : Term
+source3 =
+    TmAbs Info
+        "m"
+        (TmAbs Info
+            "n"
+            (TmAbs Info
+                "s"
+                (TmAbs Info
+                    "z"
+                    (TmApp Info
+                        (TmApp Info
+                            -- m
+                            (TmVar Info 3 4)
+                            -- s
+                            (TmVar Info 1 4)
+                        )
+                        (TmApp Info
+                            (TmApp Info
+                                -- n
+                                (TmVar Info 2 4)
+                                -- s
+                                (TmVar Info 1 4)
+                            )
+                            -- z
+                            (TmVar Info 0 4)
+                        )
+                    )
+                )
+            )
+        )
 
 
-source =
-    TmApp Info
-        (TmAbs Info "s" (TmAbs Info "z" (TmVar Info 1 2)))
-        (TmApp Info (TmVar Info 1 2) (TmVar Info 0 2))
+view source =
+    H.div []
+        [ source |> Debug.toString |> H.text |> List.singleton |> H.p []
+        , source
+            |> printtm []
+            |> Debug.toString
+            |> (++) "#=> "
+            |> H.text
+            |> List.singleton
+            |> H.p []
+        ]
 
 
 main =
     H.div []
-        [ H.div []
-            [ source |> Debug.toString |> H.text |> List.singleton |> H.p []
-            , source
-                |> printtm []
-                |> Debug.toString
-                |> H.text
-                |> List.singleton
-                |> H.p []
-            ]
+        [ [ source1, source2, source3 ]
+            |> List.map view
+            |> H.div []
         ]
