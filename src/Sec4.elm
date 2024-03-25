@@ -5,6 +5,7 @@ import Html as H
 
 type Info
     = Info
+    | File Int
 
 
 type Term
@@ -117,11 +118,20 @@ eval1 t =
             Result.Err NoRuleApplies
 
 
+source : Term
 source =
     TmIF Info
         (TmIsZero Info (TmSucc Info (TmZero Info)))
         (TmZero Info)
         (TmFalse Info)
+
+
+
+--source =
+--    TmIF (File "main.me" 1)
+--        (TmIsZero (File "main.me" 2) (TmSucc (File "main.me" 2) (TmZero (File "main.me" 2))))
+--        (TmZero (File "main.me" 3))
+--        (TmFalse (File "main.me" 4))
 
 
 main =
