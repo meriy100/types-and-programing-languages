@@ -81,9 +81,17 @@ index2name fi ctx x =
             "[index2name error3]"
 
 
+
+-- c0 = \s. \z. z
+
+
 source1 : Term
 source1 =
     TmAbs Info "s" (TmAbs Info "z" (TmVar Info 0 2))
+
+
+
+-- c1 = \s. \z. s (s z)
 
 
 source2 : Term
@@ -97,6 +105,10 @@ source2 =
                 (TmApp Info (TmVar Info 1 2) (TmVar Info 0 2))
             )
         )
+
+
+
+-- plus = \m. \n. \s. \z. m s (n s z)
 
 
 source3 : Term
@@ -132,6 +144,79 @@ source3 =
         )
 
 
+
+-- fix = \f. (\x. f (\y. x x y)) (\x. f (\y. x x y))
+
+
+source4 : Term
+source4 =
+    TmAbs Info
+        "f"
+        (TmApp Info
+            (TmAbs Info
+                "x"
+                (TmApp Info
+                    -- f
+                    (TmVar Info 1 2)
+                    (TmAbs Info
+                        "y"
+                        (TmApp Info
+                            (TmApp Info
+                                -- x
+                                (TmVar Info 1 3)
+                                -- x
+                                (TmVar Info 1 3)
+                            )
+                            -- y
+                            (TmVar Info 0 3)
+                        )
+                    )
+                )
+            )
+            (TmAbs Info
+                "x"
+                (TmApp Info
+                    -- f
+                    (TmVar Info 1 2)
+                    (TmAbs Info
+                        "y"
+                        (TmApp Info
+                            (TmApp Info
+                                -- x
+                                (TmVar Info 1 3)
+                                -- x
+                                (TmVar Info 1 3)
+                            )
+                            -- y
+                            (TmVar Info 0 3)
+                        )
+                    )
+                )
+            )
+        )
+
+
+
+-- foo = (\x. (\x. x)) (\x. x)
+-- #> ((lambda x. (lambda x'. x')) (lambda x. x))
+
+
+source5 : Term
+source5 =
+    TmApp Info
+        (TmAbs Info
+            "x"
+            (TmAbs Info
+                "x"
+                (TmVar Info 0 2)
+            )
+        )
+        (TmAbs Info
+            "x"
+            (TmVar Info 0 1)
+        )
+
+
 view source =
     H.div []
         [ source |> Debug.toString |> H.text |> List.singleton |> H.p []
@@ -147,7 +232,7 @@ view source =
 
 main =
     H.div []
-        [ [ source1, source2, source3 ]
+        [ [ source1, source2, source3, source4, source5 ]
             |> List.map view
             |> H.div []
         ]
