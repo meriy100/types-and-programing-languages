@@ -82,6 +82,52 @@ index2name fi ctx x =
 
 
 
+-- Sec.7.2 シフトと代入
+
+
+termShift : Int -> Term -> Term
+termShift d t =
+    let
+        walk c td =
+            case td of
+                TmVar fi x n ->
+                    if x >= c then
+                        TmVar fi (x + d) (n + d)
+
+                    else
+                        TmVar fi x (n + d)
+
+                TmAbs fi x t1 ->
+                    TmAbs fi x (walk (c + 1) t1)
+
+                TmApp fi t1 t2 ->
+                    TmApp fi (walk c t1) (walk c t2)
+    in
+    walk 0 t
+
+
+termSubst : Int -> Term -> Term -> Term
+termSubst j s t =
+    let
+        walk c td =
+            case td of
+                TmVar fi x n ->
+                    if x == j + c then
+                        termShift c s
+
+                    else
+                        TmVar fi x n
+
+                TmAbs fi x t1 ->
+                    TmAbs fi x (walk (c + 1) t1)
+
+                TmApp fi t1 t2 ->
+                    TmApp fi (walk c t1) (walk c t2)
+    in
+    walk 0 t
+
+
+
 -- c0 = \s. \z. z
 
 
@@ -217,6 +263,15 @@ source5 =
         )
 
 
+
+-- j = -2 になる理由がわかっていない。 j は N 番目の変数の意味のはず
+
+
+source11 : Term
+source11 =
+    termSubst -2 source1 source2
+
+
 view source =
     H.div []
         [ source |> Debug.toString |> H.text |> List.singleton |> H.p []
@@ -232,7 +287,7 @@ view source =
 
 main =
     H.div []
-        [ [ source1, source2, source3, source4, source5 ]
+        [ [ source1, source2, source3, source4, source5, source11 ]
             |> List.map view
             |> H.div []
         ]
