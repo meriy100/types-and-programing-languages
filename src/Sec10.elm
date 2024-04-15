@@ -11,6 +11,7 @@ type Info
 type Ty
     = TyArr Ty Ty
     | TyBool
+    | TyNat
 
 
 type Binding
@@ -91,6 +92,10 @@ type Term
     | TmTrue Info
     | TmFalse Info
     | TmIf Info Term Term Term
+    | TmZero Info
+    | TmSucc Info Term
+    | TmPred Info Term
+    | TmIsZero Info Term
 
 
 typeof : Context -> Term -> Result Error Ty
@@ -168,6 +173,45 @@ typeof ctx t =
                 Error fi "guard of conditional not a boolean"
                     |> Result.Err
 
+        TmZero _ ->
+            Result.Ok TyNat
+
+        TmSucc fi t1 ->
+            let
+                resultTyT1 =
+                    typeof ctx t1
+            in
+            if resultTyT1 == Result.Ok TyNat then
+                Result.Ok TyNat
+
+            else
+                Error fi "argument of succ is not a number"
+                    |> Result.Err
+
+        TmPred fi t1 ->
+            let
+                resultTyT1 =
+                    typeof ctx t1
+            in
+            if resultTyT1 == Result.Ok TyNat then
+                Result.Ok TyNat
+
+            else
+                Error fi "argument of pred is not a number"
+                    |> Result.Err
+
+        TmIsZero fi t1 ->
+            let
+                resultTyT1 =
+                    typeof ctx t1
+            in
+            if resultTyT1 == Result.Ok TyNat then
+                Result.Ok TyBool
+
+            else
+                Error fi "argument of iszero is not a number"
+                    |> Result.Err
+
 
 
 -- c0 = \s:Bool. \z:Bool. z
@@ -179,12 +223,16 @@ source1 =
 
 
 
--- if true then false else (\s:Bool. s)
+-- if 1 then 1 else 0
+
+
+one fi =
+    TmSucc fi (TmZero fi)
 
 
 source2 : Term
 source2 =
-    TmIf Info (TmTrue Info) (TmFalse Info) (TmAbs Info "s" TyBool (TmVar Info 0 1))
+    TmIf Info (one Info) (one Info) (TmZero Info)
 
 
 view source =
