@@ -17,8 +17,44 @@ end
 TyBool = 'Bool'
 TyNat = 'Nat'
 
+def add_binding(ctx, x, bind)
+  [x, bind, *ctx]
+end
+
+def get_binding(ctx, i)
+  ctx[i][1]
+end
+
+def get_type_form_context(ctx, i)
+  case get_binding(ctx, i)
+  in 'VarBind', ty
+    ty
+  in _
+    raise 'No Binding'
+  end
+end
+
+
 def typeof(ctx, t)
   case t
+  in 'TmVar', _, x, _
+    get_type_form_context(ctx, x)
+  in 'TmAbs', _, x, ty_t1, t2
+    ty_t2 = typeof(add_binding(ctx, x, ['VarBind', ty_t1]), t2)
+    ["TyArr", ty_t1, ty_t2]
+  in 'TmApp', _, t1, t2
+    ty_t1 = typeof(ctx, t1)
+    ty_t2 = typeof(ctx, t2)
+    case ty_t1
+    in 'TyArr', ty_t11, ty_t12
+      if ty_t2 == ty_t1[1]
+        ty_t1[2]
+      else
+        raise 'Type Error'
+      end
+    else
+      raise 'Type Error'
+    end
   in 'TmTrue', _
     TyBool
   in 'TmFalse', _
