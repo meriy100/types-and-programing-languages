@@ -3,13 +3,30 @@ require 'strscan'
 class Lexer
   def initialize(source)
     @scanner = StringScanner.new(source)
+    @previous_indent_level = 0
   end
 
   def tokens
     tokens = []
 
     until @scanner.eos?
-      @scanner.skip(/\s+/)
+      if @scanner.bol?
+        indent_level = @scanner.matched_size if @scanner.scan(/ */)
+        if indent_level > @previous_indent_level
+          tokens << [:INDENT, indent_level]
+        elsif indent_level < @previous_indent_level
+          tokens << [:DEDENT, indent_level]
+        end
+        @previous_indent_level = indent_level
+      end
+
+      if @scanner.check(/\n/)
+        tokens << [:NEWLINE, '\n']
+        @scanner.pos += 1
+        next
+      end
+
+      @scanner.skip(/ +/)
 
       if @scanner.scan(/"/)
         if @scanner.scan(/[^"]*/)
