@@ -99,4 +99,5 @@ main =
 EOS
 
 lexer = Lexer.new(source)
-puts lexer.tokens
+tokens = lexer.tokens
+p tokens
