@@ -1,3 +1,3 @@
-import {Nat} from "./nat";
+import { Nat } from './nat';
 
-type Int = { n: Nat, m: Nat, type: 'Int' }
+type Int = { n: Nat; m: Nat; type: 'Int' };
