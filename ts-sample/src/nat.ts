@@ -1,5 +1,7 @@
 import { identity } from './utiles';
-import { Err, Ok, Result, resultThen } from './result';
+import { Err, Ok, Result, resultMatch, resultThen } from './result';
+import { Pair, pair } from './pair';
+import { Bool, False, IF, True } from './bool';
 
 export type Nat = { v: Nat; type: 'Nat' } | { type: 'Nat' };
 export const nF =
@@ -18,6 +20,10 @@ export const nDecc = (n: Nat): Result<Nat, string> => {
   } else {
     return Err('Invalid Nat range');
   }
+};
+
+export const nIsZero = (n: Nat): Bool => {
+  return 'v' in n ? False : True;
 };
 
 export const nPlus =
@@ -41,10 +47,21 @@ export const nMul =
 export const nDiv =
   (m: Nat) =>
   (n: Nat): Result<Nat, string> => {
+    const innerDiv =
+      (l: Nat) =>
+      (acc: Nat): Result<Nat, string> => {
+        return resultThen((v: Nat) =>
+          IF<Result<Nat, string>>(nIsZero(v))({
+            True: () => Ok(acc),
+            False: () => innerDiv(v)(nSucc(acc)),
+          }),
+        )(nSub(l)(n));
+      };
+
     if ('v' in n) {
-      return nF(resultThen(nSub(n)))(n)(Ok(m));
+      return innerDiv(m)(NOne);
     } else {
-      return Err('Zero division error');
+      return Err('Division by zero is not allowed');
     }
   };
 

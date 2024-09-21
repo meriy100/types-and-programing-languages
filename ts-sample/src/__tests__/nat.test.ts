@@ -65,12 +65,12 @@ describe('Nat', () => {
     });
 
     it('5 / 5 = 1', () => {
-      expect(natToNumber(resultToValue(nSub(NFive)(NFive)))).toBe(1);
+      expect(natToNumber(resultToValue(nDiv(NFive)(NFive)))).toBe(1);
     });
 
     it('5 / 0 = Error', () => {
       expect(() => resultToValue(nDiv(NFive)(NZero))).toThrow(
-        'Zero division error',
+        'Division by zero is not allowed',
       );
     });
 

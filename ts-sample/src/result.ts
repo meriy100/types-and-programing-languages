@@ -10,3 +10,13 @@ export const resultThen =
       return result;
     }
   };
+
+export const resultMatch =
+  <T, E, U>(match: { Ok: (v: T) => U; Err: (e: E) => U }) =>
+  (result: Result<T, E>): U => {
+    if (result.type === 'Ok') {
+      return match.Ok(result.value);
+    } else {
+      return match.Err(result.error);
+    }
+  };
