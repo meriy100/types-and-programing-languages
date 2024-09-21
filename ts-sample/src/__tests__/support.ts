@@ -2,6 +2,7 @@ import { Nat } from '../nat';
 import { Result } from '../result';
 import { Int } from '../int';
 import { Rel } from '../rel';
+import { Bool } from '../bool';
 
 export const natToNumber = (n: Nat): number =>
   'v' in n ? 1 + natToNumber(n.v) : 0;
@@ -16,3 +17,6 @@ export const intToNumber = (n: Int): number =>
 
 export const relToNumber = (r: Rel): number =>
   intToNumber(r.t) / intToNumber(r.b);
+
+export const boolToBoolean = (b: Bool): boolean =>
+  b.type === 'True' ? true : false;

@@ -1,5 +1,6 @@
 import {
   nDiv,
+  nEq,
   NFive,
   NFour,
   nMul,
@@ -12,7 +13,7 @@ import {
   NTwo,
   NZero,
 } from '../nat';
-import { natToNumber, resultToValue } from './support';
+import { boolToBoolean, natToNumber, resultToValue } from './support';
 
 // 自然数
 
@@ -24,6 +25,20 @@ describe('Nat', () => {
 
     it('1 = 1', () => {
       expect(natToNumber(NOne)).toBe(1);
+    });
+  });
+
+  describe('nEq', () => {
+    it('1 == 1 = true', () => {
+      expect(boolToBoolean(nEq(NOne)(NOne))).toBe(true);
+    });
+
+    it('1 == 2 = false', () => {
+      expect(boolToBoolean(nEq(NOne)(NTwo))).toBe(false);
+    });
+
+    it('2 == 1 = false', () => {
+      expect(boolToBoolean(nEq(NTwo)(NOne))).toBe(false);
     });
   });
 

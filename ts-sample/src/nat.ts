@@ -1,7 +1,14 @@
-import { identity } from './utiles';
-import { Err, Ok, Result, resultMatch, resultThen } from './result';
+import { comp, identity } from './utiles';
+import {
+  Err,
+  Ok,
+  Result,
+  resultMatch,
+  resultThen,
+  resultWithDefault,
+} from './result';
 import { Pair, pair } from './pair';
-import { Bool, False, IF, True } from './bool';
+import { Bool, False, IF, Not, OR, True } from './bool';
 
 export type Nat = { v: Nat; type: 'Nat' } | { type: 'Nat' };
 export const nF =
@@ -22,27 +29,42 @@ export const nDecc = (n: Nat): Result<Nat, string> => {
   }
 };
 
-export const nIsZero = (n: Nat): Bool => {
-  return 'v' in n ? False : True;
-};
+export const nIsZero = (n: Nat): Bool => ('v' in n ? False : True);
+
+export const nGt =
+  (m: Nat) =>
+  (n: Nat): Bool =>
+    resultWithDefault(False)(
+      resultThen<Nat, string, Bool>(
+        comp<Nat, Bool, Result<Bool, string>>(
+          comp<Nat, Bool, Bool>(nIsZero)(Not),
+        )(Ok),
+      )(nSub(m)(n)),
+    );
+
+export const nEq =
+  (n: Nat) =>
+  (m: Nat): Bool =>
+    resultWithDefault(False)(
+      resultThen<Nat, string, Bool>(
+        comp<Nat, Bool, Result<Bool, string>>(nIsZero)(Ok),
+      )(nSub(m)(n)),
+    );
 
 export const nPlus =
   (m: Nat) =>
-  (n: Nat): Nat => {
-    return nF(nSucc)(n)(m);
-  };
+  (n: Nat): Nat =>
+    nF(nSucc)(n)(m);
 
 export const nSub =
   (m: Nat) =>
-  (n: Nat): Result<Nat, string> => {
-    return nF(resultThen(nDecc))(n)(Ok(m));
-  };
+  (n: Nat): Result<Nat, string> =>
+    nF(resultThen(nDecc))(n)(Ok(m));
 
 export const nMul =
   (m: Nat) =>
-  (n: Nat): Nat => {
-    return nF(nPlus(m))(n)(NZero);
-  };
+  (n: Nat): Nat =>
+    nF(nPlus(m))(n)(NZero);
 
 export const nDiv =
   (m: Nat) =>
