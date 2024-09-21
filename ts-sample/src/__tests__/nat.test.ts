@@ -1,8 +1,11 @@
 import {
+  nDiv,
   NFive,
+  NFour,
   nMul,
   NOne,
   nPlus,
+  NSix,
   nSub,
   nSucc,
   NThree,
@@ -53,6 +56,34 @@ describe('Nat', () => {
 
     it('5 * 3 = 15', () => {
       expect(natToNumber(nMul(NFive)(NThree))).toBe(15);
+    });
+  });
+
+  describe('nDiv', () => {
+    it('6 / 3 = 2', () => {
+      expect(natToNumber(resultToValue(nDiv(NSix)(NThree)))).toBe(2);
+    });
+
+    it('5 / 5 = 1', () => {
+      expect(natToNumber(resultToValue(nSub(NFive)(NFive)))).toBe(1);
+    });
+
+    it('5 / 0 = Error', () => {
+      expect(() => resultToValue(nDiv(NFive)(NZero))).toThrow(
+        'Zero division error',
+      );
+    });
+
+    it('3 / 4 = Error', () => {
+      expect(() => resultToValue(nDiv(NThree)(NFour))).toThrow(
+        'Invalid Nat range',
+      );
+    });
+
+    it('5 / 3 = Error', () => {
+      expect(() => resultToValue(nDiv(NFive)(NThree))).toThrow(
+        'Invalid Nat range',
+      );
     });
   });
 });

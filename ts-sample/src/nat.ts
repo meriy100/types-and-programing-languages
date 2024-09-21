@@ -38,9 +38,20 @@ export const nMul =
     return nF(nPlus(m))(n)(NZero);
   };
 
+export const nDiv =
+  (m: Nat) =>
+  (n: Nat): Result<Nat, string> => {
+    if ('v' in n) {
+      return nF(resultThen(nSub(n)))(n)(Ok(m));
+    } else {
+      return Err('Zero division error');
+    }
+  };
+
 export const NZero: Nat = { type: 'Nat' };
 export const NOne = nSucc(NZero);
 export const NTwo = nSucc(NOne);
 export const NThree = nSucc(NTwo);
 export const NFour = nSucc(NThree);
 export const NFive = nSucc(NFour);
+export const NSix = nSucc(NFive);
