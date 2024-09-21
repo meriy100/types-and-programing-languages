@@ -1,5 +1,4 @@
 import {
-  Nat,
   NFive,
   nMul,
   NOne,
@@ -10,14 +9,7 @@ import {
   NTwo,
   NZero,
 } from '../nat';
-import { Result } from '../result';
-
-const natToNumber = (n: Nat): number => ('v' in n ? 1 + natToNumber(n.v) : 0);
-
-const resultToValue = <T, E>(result: Result<T, E>) => {
-  if (result.type === 'Ok') return result.value;
-  throw result.error;
-};
+import { natToNumber, resultToValue } from './support';
 
 // 自然数
 
